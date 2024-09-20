@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Count</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, green, gray);
+            color: white;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        h1 {
+            color: white;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+        .description {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .input-box {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .image-container {
+            position: relative;
+            margin-top: 20px;
+            display: inline-block;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+        }
+        .logo-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            width: 50px;
+            height: 50px;
+            opacity: 0.7;
+        }
+        .object-count {
+            display: inline-block;
+            background-color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .yellow { background-color: yellow; }
+        .blue { background-color: blue; }
+        table {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid white;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Digital Count</h1>
+
+    <div class="container">
+        <img src="https://agroindata.com/images/logo.jpg" alt="AGROinDATA Logo" class="logo">
+        
+        <p class="description">
+            This is an online tool to count objects, leave records and make data available to whoever needs it, courtesy of AGROinDATA see more in agroindata.com.
+        </p>
+
+        <div class="input-box">
+            <input type="text" placeholder="Write a title here">
+        </div>
+
+        <input type="file" accept="image/*" id="imageInput">
+        <button onclick="document.getElementById('imageInput').click()">Upload Image</button>
+
+        <div id="imageContainer" class="image-container">
+            <!-- Image uploaded by user will be displayed here -->
+        </div>
+
+        <div>
+            <button onclick="setObject('object1')">Count Object 1 (Yellow Circle)</button>
+            <button onclick="setObject('object2')">Count Object 2 (Blue Circle)</button>
+            <button onclick="undo()">Undo</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Object</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Object 1 (Yellow)</td>
+                    <td id="object1Count">0</td>
+                </tr>
+                <tr>
+                    <td>Object 2 (Blue)</td>
+                    <td id="object2Count">0</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <button onclick="downloadCSV()">Download CSV</button>
+
+        <p class="footer">
+            Created by Christian Stange Marcus, AGROinDATA with AI. For more information: agroindata@gmail.com  see more in agroindata.com
+        </p>
+    </div>
+
+    <script>
+        let currentObject = 'object1';
+        let counts = { object1: 0, object2: 0 };
+        let history = [];
+
+        function setObject(object) {
+            currentObject = object;
+        }
+
+        function undo() {
+            if (history.length > 0) {
+                const last = history.pop();
+                last.element.remove();
+                counts[last.object]--;
+                updateCounts();
+            }
+        }
+
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageContainer = document.getElementById('imageContainer');
+                imageContainer.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image">`;
+                const logo = document.createElement('img');
+                logo.src = 'https://agroindata.com/images/logo.jpg';
+                logo.className = 'logo-overlay';
+                imageContainer.appendChild(logo);
+                imageContainer.addEventListener('click', addObjectCount);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function addObjectCount(event) {
+            const imageContainer = document.getElementById('imageContainer');
+            const rect = imageContainer.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            const circle = document.createElement('div');
+            circle.className = `object-count ${currentObject === 'object1' ? 'yellow' : 'blue'}`;
+            circle.style.left = `${x}px`;
+            circle.style.top = `${y}px`;
+
+            imageContainer.appendChild(circle);
+
+            history.push({ element: circle, object: currentObject });
+            counts[currentObject]++;
+            updateCounts();
+        }
+
+        function updateCounts() {
+            document.getElementById('object1Count').innerText = counts.object1;
+            document.getElementById('object2Count').innerText = counts.object2;
+        }
+
+        function downloadCSV() {
+            const csv = `Object,Count\nObject 1 (Yellow),${counts.object1}\nObject 2 (Blue),${counts.object2}`;
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'counts.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+
+</body>
+</html>
