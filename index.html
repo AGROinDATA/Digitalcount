@@ -6,211 +6,253 @@
     <title>Digital Count</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, green, gray);
-            color: white;
             margin: 0;
             padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(green, gray);
+            color: white;
             text-align: center;
         }
         h1 {
             color: white;
-            padding: 20px;
+            margin: 20px 0;
         }
         .container {
-            max-width: 900px;
+            width: 90%;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
         }
         .logo {
             width: 150px;
-            margin-bottom: 20px;
+            margin: 20px auto;
         }
         .description {
-            font-size: 18px;
-            margin-bottom: 20px;
+            font-size: 1.2em;
+            margin: 20px 0;
         }
         .input-box {
-            margin-bottom: 20px;
+            margin: 20px 0;
         }
-        input[type="text"] {
-            width: 100%;
+        input[type="file"], input[type="text"] {
+            display: block;
+            margin: 10px auto;
             padding: 10px;
-            font-size: 16px;
+            font-size: 1em;
         }
         button {
             padding: 10px 20px;
-            font-size: 16px;
+            font-size: 1em;
+            margin: 10px;
             cursor: pointer;
         }
-        .image-container {
-            position: relative;
-            margin-top: 20px;
-            display: inline-block;
+        #object1Btn {
+            background-color: yellow;
+            color: black;
         }
-        .image-container img {
+        #object2Btn {
+            background-color: blue;
+            color: white;
+        }
+        #undoBtn, #clearBtn, #downloadBtn {
+            background-color: gray;
+            color: white;
+        }
+        #refreshBtn {
+            background-color: red;
+            color: white;
+        }
+        .canvas-container {
+            position: relative;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        #uploadedImage {
             max-width: 100%;
             height: auto;
         }
-        .logo-overlay {
+        #agroLogo {
             position: absolute;
             bottom: 10px;
-            left: 10px;
+            right: 10px;
             width: 50px;
             height: 50px;
-            opacity: 0.7;
         }
-        .object-count {
-            display: inline-block;
-            background-color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            position: absolute;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
+        canvas {
+            border: 2px solid white;
         }
-        .yellow { background-color: yellow; }
-        .blue { background-color: blue; }
+        .count-table {
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+        }
         table {
-            margin-top: 20px;
             width: 100%;
+            color: white;
             border-collapse: collapse;
         }
-        table, th, td {
-            border: 1px solid white;
-        }
-        th, td {
+        td, th {
             padding: 10px;
-            text-align: center;
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 14px;
+            border-bottom: 1px solid white;
         }
     </style>
 </head>
 <body>
-
-    <h1>Digital Count</h1>
-
     <div class="container">
-        <img src="https://agroindata.com/images/logo.jpg" alt="AGROinDATA Logo" class="logo">
-        
-        <p class="description">
-            This is an online tool to count objects, leave records and make data available to whoever needs it, courtesy of AGROinDATA see more in agroindata.com.
-        </p>
+        <h1>Digital Count</h1>
+        <a href="https://agroindata.com" target="_blank">
+            <img src="https://agroindata.com/images/logo.jpg" alt="AGROinDATA Logo" class="logo">
+        </a>
+        <p class="description">1.- Instructions</p>
+	<p class="description">1.- Select an image</p>
+        <p class="description">2.- Choose Yellow/Blue button to count</p>
+        <p class="description">3.- Download the data with CSV file or just make a Screenshot :)</p>
+        <p class="description">This is an online tool to count objects, leave records, and make data available to whoever needs it, courtesy of AGROinDATA. For any demo or other requests, please contact us at agroindata@gmail.com</p>
+        <p class="description">more info: AGROinDATA.com</p>
 
         <div class="input-box">
-            <input type="text" placeholder="Write a title here">
+            <input type="text" placeholder="Write a title here" id="titleInput">
+            <input type="file" accept="image/*" id="imageUpload" onchange="loadImage(event)">
         </div>
 
-        <input type="file" accept="image/*" id="imageInput">
-        <button onclick="document.getElementById('imageInput').click()">Upload Image</button>
-
-        <div id="imageContainer" class="image-container">
-            <!-- Image uploaded by user will be displayed here -->
+        <div class="canvas-container">
+            <canvas id="canvas" width="200" height="100"></canvas>
+            <img src="https://agroindata.com/images/logo.jpg" alt="AGROinDATA Logo" id="agroLogo">
         </div>
 
         <div>
-            <button onclick="setObject('object1')">Count Object 1 (Yellow Circle)</button>
-            <button onclick="setObject('object2')">Count Object 2 (Blue Circle)</button>
-            <button onclick="undo()">Undo</button>
+            <button id="object1Btn" onclick="selectObject(1)">Object 1</button>
+            <button id="object2Btn" onclick="selectObject(2)">Object 2</button>
+            <button id="undoBtn" onclick="undoAction()">Undo</button>
+            <button id="clearBtn" onclick="clearCanvas()">🔄 Refresh</button>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Object</th>
-                    <th>Count</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Object 1 (Yellow)</td>
-                    <td id="object1Count">0</td>
-                </tr>
-                <tr>
-                    <td>Object 2 (Blue)</td>
-                    <td id="object2Count">0</td>
-                </tr>
-            </tbody>
-        </table>
-        
-        <button onclick="downloadCSV()">Download CSV</button>
+        <div class="count-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Object</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody id="countTableBody">
+                    <tr>
+                        <td>Object 1</td>
+                        <td id="object1Count">0</td>
+                    </tr>
+                    <tr>
+                        <td>Object 2</td>
+                        <td id="object2Count">0</td>
+                    </tr>
+                </tbody>
+            </table>
+            <button id="downloadBtn" onclick="downloadCSV()">Download CSV</button>
+        </div>
 
-        <p class="footer">
-            Created by Christian Stange Marcus, AGROinDATA with AI. For more information: agroindata@gmail.com  see more in agroindata.com
-        </p>
+        <p>Created by Christian Stange Marcus, AGROinDATA with AI. More information: <a href="mailto:agroindata@gmail.com">agroindata@gmail.com</a></p>
     </div>
 
     <script>
-        let currentObject = 'object1';
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let selectedObject = null;
+        let actions = [];
         let counts = { object1: 0, object2: 0 };
-        let history = [];
+        let uploadedImage = null;
 
-        function setObject(object) {
-            currentObject = object;
-        }
-
-        function undo() {
-            if (history.length > 0) {
-                const last = history.pop();
-                last.element.remove();
-                counts[last.object]--;
-                updateCounts();
+        function loadImage(event) {
+            let reader = new FileReader();
+            reader.onload = function() {
+                uploadedImage = new Image();
+                uploadedImage.onload = function() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    canvas.width = uploadedImage.width;
+                    canvas.height = uploadedImage.height;
+                    ctx.drawImage(uploadedImage, 0, 0);
+                    drawLogo();
+                }
+                uploadedImage.src = reader.result;
             }
+            reader.readAsDataURL(event.target.files[0]);
         }
 
-        document.getElementById('imageInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const imageContainer = document.getElementById('imageContainer');
-                imageContainer.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image">`;
-                const logo = document.createElement('img');
-                logo.src = 'https://agroindata.com/images/logo.jpg';
-                logo.className = 'logo-overlay';
-                imageContainer.appendChild(logo);
-                imageContainer.addEventListener('click', addObjectCount);
-            };
-            reader.readAsDataURL(file);
-        });
-
-        function addObjectCount(event) {
-            const imageContainer = document.getElementById('imageContainer');
-            const rect = imageContainer.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
-            const circle = document.createElement('div');
-            circle.className = `object-count ${currentObject === 'object1' ? 'yellow' : 'blue'}`;
-            circle.style.left = `${x}px`;
-            circle.style.top = `${y}px`;
-
-            imageContainer.appendChild(circle);
-
-            history.push({ element: circle, object: currentObject });
-            counts[currentObject]++;
-            updateCounts();
+        function drawLogo() {
+            let logo = document.getElementById('agroLogo');
+            ctx.drawImage(logo, canvas.width - 60, canvas.height - 60, 50, 50);
         }
 
-        function updateCounts() {
-            document.getElementById('object1Count').innerText = counts.object1;
-            document.getElementById('object2Count').innerText = counts.object2;
+        function selectObject(objectType) {
+            selectedObject = objectType;
+        }
+
+        function canvasClick(event) {
+            if (selectedObject === null) return;
+            let rect = canvas.getBoundingClientRect();
+            let x = event.clientX - rect.left;
+            let y = event.clientY - rect.top;
+
+            let color = selectedObject === 1 ? 'yellow' : 'blue';
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, 2 * Math.PI);
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            actions.push({ objectType: selectedObject, x: x, y: y });
+            counts[`object${selectedObject}`]++;
+            updateCountTable();
+        }
+
+        function undoAction() {
+            if (actions.length === 0) return;
+            actions.pop();
+            redrawCanvas();
+        }
+
+        function clearCanvas() {
+            actions = [];
+            counts = { object1: 0, object2: 0 };
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (uploadedImage) {
+                ctx.drawImage(uploadedImage, 0, 0);
+                drawLogo();
+            }
+            updateCountTable();
+        }
+
+        function redrawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (uploadedImage) {
+                ctx.drawImage(uploadedImage, 0, 0);
+            }
+            drawLogo();
+            actions.forEach(action => {
+                ctx.beginPath();
+                ctx.arc(action.x, action.y, 10, 0, 2 * Math.PI);
+                ctx.fillStyle = action.objectType === 1 ? 'yellow' : 'blue';
+                ctx.fill();
+            });
+            updateCountTable();
+        }
+
+        function updateCountTable() {
+            document.getElementById('object1Count').textContent = counts.object1;
+            document.getElementById('object2Count').textContent = counts.object2;
         }
 
         function downloadCSV() {
-            const csv = `Object,Count\nObject 1 (Yellow),${counts.object1}\nObject 2 (Blue),${counts.object2}`;
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'counts.csv';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-    </script>
+            let csvContent = 'Object,Count\n';
+            csvContent += `Object 1,${counts.object1}\n`;
+            csvContent += `Object 2,${counts.object2}\n`;
 
+            let blob = new Blob([csvContent], { type: 'text/csv' });
+            let link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'object_counts.csv';
+            link.click();
+        }
+
+        
+        canvas.addEventListener('click', canvasClick);
+    </script>
 </body>
 </html>
