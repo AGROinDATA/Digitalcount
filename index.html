@@ -9,250 +9,222 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(green, gray);
+            background: linear-gradient(to bottom, darkgreen, gray);
             color: white;
             text-align: center;
         }
         h1 {
             color: white;
-            margin: 20px 0;
+            margin-top: 20px;
+        }
+        a {
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
         .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 0 auto;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
         }
         .logo {
             width: 150px;
-            margin: 20px auto;
+            margin-bottom: 20px;
         }
         .description {
-            font-size: 1.2em;
-            margin: 20px 0;
-        }
-        .input-box {
-            margin: 20px 0;
+            font-size: 18px;
+            margin-bottom: 20px;
         }
         input[type="file"], input[type="text"] {
-            display: block;
-            margin: 10px auto;
+            width: 100%;
             padding: 10px;
-            font-size: 1em;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: none;
+        }
+        #image-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        #uploaded-image {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ccc;
+            display: none;
+        }
+        .agro-logo-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            display: none;
+        }
+        .button-container {
+            margin-bottom: 20px;
         }
         button {
             padding: 10px 20px;
-            font-size: 1em;
-            margin: 10px;
+            margin: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
             cursor: pointer;
         }
-        #object1Btn {
+        #object1 {
             background-color: yellow;
             color: black;
         }
-        #object2Btn {
+        #object2 {
             background-color: blue;
             color: white;
         }
-        #undoBtn, #clearBtn, #downloadBtn {
+        #undo, #refresh {
             background-color: gray;
             color: white;
         }
-        #refreshBtn {
-            background-color: red;
-            color: white;
-        }
-        .canvas-container {
-            position: relative;
-            display: inline-block;
-            margin-top: 20px;
-        }
-        #uploadedImage {
-            max-width: 100%;
-            height: auto;
-        }
-        #agroLogo {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            width: 50px;
-            height: 50px;
-        }
-        canvas {
-            border: 2px solid white;
-        }
-        .count-table {
-            margin: 20px auto;
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 20px;
-            border-radius: 10px;
-        }
-        table {
+        #count-table {
             width: 100%;
-            color: white;
+            margin-top: 20px;
+            color: black;
+            background-color: white;
             border-collapse: collapse;
         }
-        td, th {
+        #count-table th, #count-table td {
             padding: 10px;
-            border-bottom: 1px solid white;
+            border: 1px solid #ccc;
         }
     </style>
 </head>
 <body>
+
+    <h1>Digital Count</h1>
+
     <div class="container">
-        <h1>Digital Count</h1>
-        <a href="https://agroindata.com" target="_blank">
-            <img src="https://agroindata.com/images/logo.jpg" alt="AGROinDATA Logo" class="logo">
-        </a>
-        <p class="description">1.- Instructions</p>
-	<p class="description">1.- Select an image</p>
-        <p class="description">2.- Choose Yellow/Blue button to count</p>
-        <p class="description">3.- Download the data with CSV file or just make a Screenshot :)</p>
-        <p class="description">This is an online tool to count objects, leave records, and make data available to whoever needs it, courtesy of AGROinDATA. For any demo or other requests, please contact us at agroindata@gmail.com</p>
-        <p class="description">more info: AGROinDATA.com</p>
+        <img src="https://agroindata.com/images/logo.jpg" alt="AGROinDATA Logo" class="logo">
+        <p><a href="https://agroindata.com/" target="_blank">agroindata.com</a></p>
+        
+        <p class="description">
+            Instructions:<br>
+            1.- Select an image<br>
+            2.- Choose Yellow/Blue button to mark<br>
+            3.- Download the data with CSV file or just make a Screenshot :)<br>
+            This is an online tool to count objects, leave records and make data available to whoever needs it, courtesy of AGROinDATA.<br>
+            For any customization demo or other requests, please contact us at <a href="mailto:agroindata@gmail.com">agroindata@gmail.com</a>.<br>
+            For more info visit <a href="https://agroindata.com/" target="_blank">www.agroindata.com</a>
+        </p>
 
-        <div class="input-box">
-            <input type="text" placeholder="Write a title here" id="titleInput">
-            <input type="file" accept="image/*" id="imageUpload" onchange="loadImage(event)">
+        <input type="text" id="title-input" placeholder="Write a title here">
+
+        <div id="image-box">
+            <input type="file" id="image-upload" accept="image/*">
+            <img id="uploaded-image" alt="Uploaded Image">
+            <img src="https://agroindata.com/images/logo.jpg" class="agro-logo-overlay" id="logo-overlay">
         </div>
 
-        <div class="canvas-container">
-            <canvas id="canvas" width="200" height="100"></canvas>
-            <img src="https://agroindata.com/images/logo.jpg" alt="AGROinDATA Logo" id="agroLogo">
+        <div class="button-container">
+            <button id="object1">Object 1</button>
+            <button id="object2">Object 2</button>
+            <button id="undo">Undo</button>
+            <button id="refresh" onclick="location.reload();">Refresh 🔄</button>
         </div>
 
-        <div>
-            <button id="object1Btn" onclick="selectObject(1)">Object 1</button>
-            <button id="object2Btn" onclick="selectObject(2)">Object 2</button>
-            <button id="undoBtn" onclick="undoAction()">Undo</button>
-            <button id="clearBtn" onclick="clearCanvas()">🔄 Refresh</button>
-        </div>
+        <table id="count-table">
+            <thead>
+                <tr>
+                    <th>Object</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Object 1 (Yellow)</td>
+                    <td id="object1-count">0</td>
+                </tr>
+                <tr>
+                    <td>Object 2 (Blue)</td>
+                    <td id="object2-count">0</td>
+                </tr>
+            </tbody>
+        </table>
 
-        <div class="count-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Object</th>
-                        <th>Count</th>
-                    </tr>
-                </thead>
-                <tbody id="countTableBody">
-                    <tr>
-                        <td>Object 1</td>
-                        <td id="object1Count">0</td>
-                    </tr>
-                    <tr>
-                        <td>Object 2</td>
-                        <td id="object2Count">0</td>
-                    </tr>
-                </tbody>
-            </table>
-            <button id="downloadBtn" onclick="downloadCSV()">Download CSV</button>
-        </div>
-
-        <p>Created by Christian Stange Marcus, AGROinDATA with AI. More information: <a href="mailto:agroindata@gmail.com">agroindata@gmail.com</a></p>
+        <p>Created by Christian Stange Marcus, AGROinDATA with AI. More information <a href="mailto:agroindata@gmail.com">agroindata@gmail.com</a></p>
     </div>
 
     <script>
-        let canvas = document.getElementById('canvas');
-        let ctx = canvas.getContext('2d');
-        let selectedObject = null;
-        let actions = [];
-        let counts = { object1: 0, object2: 0 };
-        let uploadedImage = null;
+        let object1Count = 0;
+        let object2Count = 0;
+        let currentObject = null;
+        const circles = [];
 
-        function loadImage(event) {
-            let reader = new FileReader();
-            reader.onload = function() {
-                uploadedImage = new Image();
-                uploadedImage.onload = function() {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    canvas.width = uploadedImage.width;
-                    canvas.height = uploadedImage.height;
-                    ctx.drawImage(uploadedImage, 0, 0);
-                    drawLogo();
+        document.getElementById('object1').addEventListener('click', () => {
+            currentObject = 'object1';
+        });
+
+        document.getElementById('object2').addEventListener('click', () => {
+            currentObject = 'object2';
+        });
+
+        document.getElementById('image-upload').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('uploaded-image');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('logo-overlay').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('uploaded-image').addEventListener('click', function(event) {
+            if (currentObject) {
+                const rect = this.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top + 50; // Position the circle 50px lower
+                const circle = document.createElement('div');
+                circle.style.position = 'absolute';
+                circle.style.left = `${x - 10}px`;
+                circle.style.top = `${y - 10}px`;
+                circle.style.width = '20px';
+                circle.style.height = '20px';
+                circle.style.borderRadius = '50%';
+                circle.style.backgroundColor = currentObject === 'object1' ? 'yellow' : 'blue';
+                document.getElementById('image-box').appendChild(circle);
+                circles.push(circle);
+
+                if (currentObject === 'object1') {
+                    object1Count++;
+                    document.getElementById('object1-count').textContent = object1Count;
+                } else {
+                    object2Count++;
+                    document.getElementById('object2-count').textContent = object2Count;
                 }
-                uploadedImage.src = reader.result;
             }
-            reader.readAsDataURL(event.target.files[0]);
-        }
+        });
 
-        function drawLogo() {
-            let logo = document.getElementById('agroLogo');
-            ctx.drawImage();
-        }
-
-        function selectObject(objectType) {
-            selectedObject = objectType;
-        }
-
-        function canvasClick(event) {
-            if (selectedObject === null) return;
-            let rect = canvas.getBoundingClientRect();
-            let x = event.clientX - rect.left;
-            let y = event.clientY - rect.top;
-
-            let color = selectedObject === 1 ? 'yellow' : 'blue';
-            ctx.beginPath();
-            ctx.arc(x, y, 10, 0, 2 * Math.PI);
-            ctx.fillStyle = color;
-            ctx.fill();
-
-            actions.push({ objectType: selectedObject, x: x, y: y });
-            counts[`object${selectedObject}`]++;
-            updateCountTable();
-        }
-
-        function undoAction() {
-            if (actions.length === 0) return;
-            actions.pop();
-            redrawCanvas();
-        }
-
-        function clearCanvas() {
-            actions = [];
-            counts = { object1: 0, object2: 0 };
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (uploadedImage) {
-                ctx.drawImage(uploadedImage, 0, 0);
-                drawLogo();
+        document.getElementById('undo').addEventListener('click', function() {
+            if (circles.length > 0) {
+                const lastCircle = circles.pop();
+                lastCircle.remove();
+                if (currentObject === 'object1' && object1Count > 0) {
+                    object1Count--;
+                    document.getElementById('object1-count').textContent = object1Count;
+                } else if (currentObject === 'object2' && object2Count > 0) {
+                    object2Count--;
+                    document.getElementById('object2-count').textContent = object2Count;
+                }
             }
-            updateCountTable();
-        }
-
-        function redrawCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (uploadedImage) {
-                ctx.drawImage(uploadedImage, 0, 0);
-            }
-            drawLogo();
-            actions.forEach(action => {
-                ctx.beginPath();
-                ctx.arc(action.x, action.y, 10, 0, 2 * Math.PI);
-                ctx.fillStyle = action.objectType === 1 ? 'yellow' : 'blue';
-                ctx.fill();
-            });
-            updateCountTable();
-        }
-
-        function updateCountTable() {
-            document.getElementById('object1Count').textContent = counts.object1;
-            document.getElementById('object2Count').textContent = counts.object2;
-        }
-
-        function downloadCSV() {
-            let csvContent = 'Object,Count\n';
-            csvContent += `Object 1,${counts.object1}\n`;
-            csvContent += `Object 2,${counts.object2}\n`;
-
-            let blob = new Blob([csvContent], { type: 'text/csv' });
-            let link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'object_counts.csv';
-            link.click();
-        }
-
-        
-        canvas.addEventListener('click', canvasClick);
+        });
     </script>
+
 </body>
 </html>
