@@ -100,6 +100,10 @@
             padding: 10px;
             border: 1px solid #ccc;
         }
+        #visitor-counter {
+            margin-top: 20px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -108,7 +112,7 @@
 
     <div class="container">
         <img src="https://agroindata.com/images/logo.jpg" alt="AGROinDATA Logo" class="logo">
-        <p><a href="https://agroindata.com/" target="_blank">agroindata.com</a></p>
+        <p><a href="https://www.agroindata.com/" target="_blank">agroindata.com</a></p>
         
         <p class="description">
             Instructions:<br>
@@ -117,7 +121,7 @@
             3.- Download the data with CSV file or just make a Screenshot :)<br>
             This is an online tool to count objects, leave records and make data available to whoever needs it, courtesy of AGROinDATA.<br>
             For any customization demo or other requests, please contact us at <a href="mailto:agroindata@gmail.com">agroindata@gmail.com</a>.<br>
-            For more info visit <a href="https://agroindata.com/" target="_blank">www.agroindata.com</a>
+            For more info visit <a href="https://www.agroindata.com/" target="_blank">www.agroindata.com</a>
         </p>
 
         <input type="text" id="title-input" placeholder="Write a title here">
@@ -154,7 +158,9 @@
             </tbody>
         </table>
 
-        <p> Note: Practice before use. The undo option only works if no changes have been between the selected object. We are currently working to improve this tool. Created by Christian Stange Marcus, AGROinDATA with AI. More information <a href="mailto:agroindata@gmail.com">agroindata@gmail.com</a></p>
+        <p id="visitor-counter">Visitors: <span id="visitor-count">0</span></p>
+
+        <p>Note: Practice before use. The undo option only works if no changes have been between the selected object. We are currently working to improve this tool. Created by Christian Stange Marcus, AGROinDATA with AI. More information <a href="mailto:agroindata@gmail.com">agroindata@gmail.com</a></p>
     </div>
 
     <script>
@@ -162,6 +168,13 @@
         let object2Count = 0;
         let currentObject = null;
         const circles = [];
+
+        // Visitor counter
+        const visitorCountElement = document.getElementById('visitor-count');
+        let visitorCount = localStorage.getItem('visitorCount') ? parseInt(localStorage.getItem('visitorCount')) : 0;
+        visitorCount++;
+        localStorage.setItem('visitorCount', visitorCount);
+        visitorCountElement.textContent = visitorCount;
 
         document.getElementById('object1').addEventListener('click', () => {
             currentObject = 'object1';
