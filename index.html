@@ -157,6 +157,7 @@
                 </tr>
             </tbody>
         </table>
+        <button onclick="downloadCSV()">Download CSV</button>
 
         <p id="visitor-counter">Visitors: <span id="visitor-count">0</span></p>
 
@@ -237,6 +238,18 @@
                 }
             }
         });
+       // Download CSV
+        function downloadCSV() {
+            const csvContent = 'data:text/csv;charset=utf-8,Object 1 Count,Object 2 Count\n' + object1Count + ',' + object2Count;
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'object_counts.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
     </script>
 
 </body>
